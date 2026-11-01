@@ -1,0 +1,18 @@
+node_modules/
+dist/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# Secrets: only the examples are committed
+.env
+.env.*
+!.env.example
+
+# Local MongoDB data from `npm run db:local`
+.mongo-data/
+
+*.log
+.DS_Store

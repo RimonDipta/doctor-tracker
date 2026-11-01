@@ -1,0 +1,176 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-geist-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-sage: var(--sage);
+  --color-warning: var(--warning);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  --background: #f6f7f6;
+  --foreground: #17211f;
+  --card: #ffffff;
+  --card-foreground: #202624;
+  --popover: #ffffff;
+  --popover-foreground: #202624;
+  --primary: #087f72;
+  --primary-hover: #06695f;
+  --primary-foreground: #ffffff;
+  --secondary: #edf2f0;
+  --secondary-foreground: #202624;
+  --muted: #f0f3f1;
+  --muted-foreground: #64716d;
+  --accent: #e3f3ef;
+  --accent-foreground: #0f5d55;
+  --destructive: #b3412e;
+  --border: #e3e9e6;
+  --input: #d5dfda;
+  --ring: #087f72;
+  --sage: #a9bdb0;
+  --warning: #a9720f;
+  --chart-1: #0b8276;
+  --chart-2: #d0702f;
+  --chart-3: #4c6fc4;
+  --chart-4: #a98a12;
+  --chart-5: #a14f97;
+  --chart-other: #b9bdb7;
+  --chart-grid: #eeeee8;
+  --radius: 0.375rem;
+  --sidebar: #fbfcfb;
+  --sidebar-foreground: #202624;
+  --sidebar-primary: #087f72;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #eeeee8;
+  --sidebar-accent-foreground: #202624;
+  --sidebar-border: #e3e9e6;
+  --sidebar-ring: #087f72;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "ss01", "cv11";
+  }
+  /* Date pickers follow the accent colour and the brand's small radius. */
+  input[type="date"] {
+    accent-color: var(--primary);
+  }
+}
+
+@layer utilities {
+  /* Small tracked label used for eyebrows, table headers and chart captions. */
+  .label-caps {
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* Refined surfaces: quiet borders, crisp focus, and restrained motion. */
+@layer base {
+  ::selection {
+    color: #064e45;
+    background: #c9eee5;
+  }
+
+  a, button, input, textarea, select {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button, [role="button"] {
+    transition-property: color, background-color, border-color, box-shadow, transform;
+    transition-duration: 140ms;
+    transition-timing-function: ease-out;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  .surface {
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    background: var(--card);
+    box-shadow: 0 1px 2px rgb(20 35 30 / 3%);
+  }
+
+  .surface-hover {
+    transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+  }
+
+  .surface-hover:hover {
+    border-color: #cbd8d2;
+    box-shadow: 0 8px 24px rgb(20 35 30 / 5%);
+    transform: translateY(-1px);
+  }
+
+  .quiet-grid {
+    background-image: linear-gradient(to right, rgb(8 127 114 / 3%) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(8 127 114 / 3%) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+}
