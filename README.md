@@ -62,62 +62,38 @@ Doctor Tracker is a web app for clinic administrators who need one place to mana
 
 ## Technology stack
 
-| Layer | Choice |
-
-| --- | --- |
-
-| Frontend | Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4 |
-
-| UI | shadcn/ui (customized), Lucide icons, Recharts, Geist |
-
-| Data and forms | TanStack Query, React Hook Form, Zod |
-
-| Backend | Node.js, Express 5, TypeScript |
-
-| Database | MongoDB with Mongoose |
-
-| Auth | Server-side sessions in HTTP-only cookies, bcrypt |
-
-| Tests | Vitest, Supertest, mongodb-memory-server |
+| Layer          | Choice                                                        |
+| -------------- | ------------------------------------------------------------- |
+| Frontend       | Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4 |
+| UI             | shadcn/ui (customized), Lucide icons, Recharts, Geist         |
+| Data and forms | TanStack Query, React Hook Form, Zod                          |
+| Backend        | Node.js, Express 5, TypeScript                                |
+| Database       | MongoDB with Mongoose                                         |
+| Auth           | Server-side sessions in HTTP-only cookies, bcrypt             |
+| Tests          | Vitest, Supertest, mongodb-memory-server                      |
 
 ## Local setup
 
 Requires **Node.js 20 or later**.
 
 ```bash
-
-*# 1. Install*
+# 1. Install
 
 cd server && npm install
-
 cd ../client && npm install
-
-
-
-*# 2. Configure*
+# 2. Configure
 
 cp server/.env.example server/.env
-
 cp client/.env.example client/.env.local
-
-
-
-*# 3. Start MongoDB (skip if you already run one on port 27017)*
+# 3. Start MongoDB (skip if you already run one on port 27017)
 
 cd server && npm run db:local
-
-
-
-*# 4. In a second terminal: load demo data, then start the API on :4000*
+# 4. In a second terminal: load demo data, then start the API on :4000
 
 cd server && npm run seed && npm run dev
-
-
-
-*# 5. In a third terminal: start the frontend on :3000*
+# 5. In a third terminal: start the frontend on :3000
 
 cd client && npm run dev
-
 ```
 
 Open <http://localhost:3000> and sign in with the [demo account](#admin-accounts).
@@ -128,32 +104,21 @@ The committed templates are [`server/.env.example`](server/.env.example) and [`c
 
 **Server**
 
-| Variable | Default | Purpose |
-
-| --- | --- | --- |
-
-| `NODE_ENV` | `development` | `production` turns on secure cookies and blocks the seed script |
-
-| `PORT` | `4000` | API port |
-
-| `MONGODB_URI` | `mongodb://127.0.0.1:27017/doctor-tracker` | Database connection |
-
-| `CLIENT_ORIGIN` | `http://localhost:3000` | Allowed browser origin(s), comma-separated. Must match exactly |
-
-| `SESSION_TTL_DAYS` | `7` | Sliding session lifetime |
-
-| `COOKIE_SECURE` | on in production | Override the cookie's `Secure` flag |
-
-| `TRUST_PROXY` | `1` | Reverse proxies in front of the API |
-
-| `SEED_ADMIN_PASSWORD` | `DemoAdmin2026!` | Demo admin password used by the seed |
+| Variable              | Default                                    | Purpose                                                         |
+| --------------------- | ------------------------------------------ | --------------------------------------------------------------- |
+| `NODE_ENV`            | `development`                              | `production` turns on secure cookies and blocks the seed script |
+| `PORT`                | `4000`                                     | API port                                                        |
+| `MONGODB_URI`         | `mongodb://127.0.0.1:27017/doctor-tracker` | Database connection                                             |
+| `CLIENT_ORIGIN`       | `http://localhost:3000`                    | Allowed browser origin(s), comma-separated. Must match exactly  |
+| `SESSION_TTL_DAYS`    | `7`                                        | Sliding session lifetime                                        |
+| `COOKIE_SECURE`       | on in production                           | Override the cookie's `Secure` flag                             |
+| `TRUST_PROXY`         | `1`                                        | Reverse proxies in front of the API                             |
+| `SEED_ADMIN_PASSWORD` | `DemoAdmin2026!`                           | Demo admin password used by the seed                            |
 
 **Client**
 
-| Variable | Default | Purpose |
-
-| --- | --- | --- |
-
+| Variable  | Default                 | Purpose                                                                                                             |
+| --------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | `API_URL` | `http://localhost:4000` | Express API, as seen from the Next.js server. Rewrites are compiled at build time, so set it before `npm run build` |
 
 ## Database
@@ -165,24 +130,21 @@ Any MongoDB 5.0 or later works. The options, easiest first:
 - **Docker:** `docker run -p 27017:27017 mongo:8`
 
 - **MongoDB Atlas (recommended for deployment):**
+  1. Create a dedicated Atlas project and cluster, then create a **database user** (not your Atlas account login).
 
-  1. Create a dedicated Atlas project and cluster, then create a **database user** (not your Atlas account login).
+  2. In **Network Access**, allow the IP address of your deployed API host. Avoid `0.0.0.0/0` except for temporary testing; never expose the database publicly without a strong database password.
 
-  2. In **Network Access**, allow the IP address of your deployed API host. Avoid `0.0.0.0/0` except for temporary testing; never expose the database publicly without a strong database password.
+  3. In **Database → Connect → Drivers**, copy the Node.js connection string. Replace `<db_password>` with the database user's password (URL-encode special characters), and include the database name `doctor-tracker`.
 
-  3. In **Database → Connect → Drivers**, copy the Node.js connection string. Replace `<db_password>` with the database user's password (URL-encode special characters), and include the database name `doctor-tracker`.
+  4. Set the full URI as `MONGODB_URI` in the API host's secret environment variables. Do not commit it or put it in a `NEXT_PUBLIC\_*` variable.
 
-  4. Set the full URI as `MONGODB_URI` in the API host's secret environment variables. Do not commit it or put it in a `NEXT_PUBLIC\_*` variable.
+  5. Confirm `/api/health` reports `database: connected` after deployment. Atlas creates the database and collections on first write; schema indexes are declared by Mongoose.
 
-  5. Confirm `/api/health` reports `database: connected` after deployment. Atlas creates the database and collections on first write; schema indexes are declared by Mongoose.
+  Example:
 
-  Example:
-
-  ```env
-
-  MONGODB_URI=mongodb+srv://<db-user>:<encoded-password>@<cluster>.mongodb.net/doctor-tracker?retryWrites=true&w=majority&appName=doctor-tracker
-
-  ```
+  ```env
+  MONGODB_URI=mongodb+srv://<db-user>:<encoded-password>@<cluster>.mongodb.net/doctor-tracker?retryWrites=true&w=majority&appName=doctor-tracker
+  ```
 
 `npm run seed` replaces all doctors, patients and activity with 18 doctors and about 250 patients spread over 14 months. Everyone in it is fictional, emails use `example.com`, and phone numbers use the reserved 555-01xx range. The seed is deterministic and relative to today's date, and it refuses to run with `NODE_ENV=production` unless passed `--force`.
 
@@ -192,20 +154,15 @@ Indexes are declared on the Mongoose schemas and built on startup.
 
 After seeding:
 
-| Email | Password |
-
-| --- | --- |
-
+| Email                     | Password         |
+| ------------------------- | ---------------- |
 | `admin@doctortracker.dev` | `DemoAdmin2026!` |
 
 These are public demo credentials. Never seed them into a real deployment. To create a real administrator, or reset one's password:
 
 ```bash
-
 cd server
-
 npm run create-admin -- --name "Jo Rivera" --email jo@clinic.org --password "a-long-passphrase"
-
 ```
 
 There is deliberately no sign-up page: only someone with database access can create an administrator.
@@ -213,51 +170,29 @@ There is deliberately no sign-up page: only someone with database access can cre
 ## Architecture and data flow
 
 ```mermaid
-
 flowchart LR
-
-    B[Browser] -->|"same-origin /api/*"| N["Next.js server<br/>pages, proxy.ts, rewrites"]
-
-    N -->|rewrite| E["Express API<br/>helmet, CORS, origin guard,<br/>rate limits, requireAuth, Zod"]
-
-    N -.->|"session check on page load"| E
-
-    E --> M[(MongoDB)]
-
+    B[Browser] -->|"same-origin /api/*"| N["Next.js server<br/>pages, proxy.ts, rewrites"]
+    N -->|rewrite| E["Express API<br/>helmet, CORS, origin guard,<br/>rate limits, requireAuth, Zod"]
+    N -.->|"session check on page load"| E
+    E --> M[(MongoDB)]
 ```
 
 ```text
-
-client/                 Next.js frontend
-
-  app/                  Routes. (app)/ is everything behind sign-in
-
-  components/
-
-    ui/                 shadcn primitives, restyled
-
-    data/               Tables, toolbars, pagination, states, dialogs
-
-    forms/ layout/      Form fields; shell, navigation, search
-
-    dashboard/ doctors/ patients/
-
-  hooks/ lib/           URL state, API client, query hooks, schemas
-
-  proxy.ts              Redirects signed-out visitors
-
-server/                 Express API
-
-  src/modules/          auth, doctors, patients, dashboard, search, activity
-
-  src/models/           Admin, Session, Doctor, Patient, Activity
-
-  src/middleware/       Auth, rate limits, origin guard, errors
-
-  scripts/              seed, create-admin, local-db
-
-  tests/                API tests against a real mongod
-
+client/                 Next.js frontend
+  app/                  Routes. (app)/ is everything behind sign-in
+  components/
+    ui/                 shadcn primitives, restyled
+    data/               Tables, toolbars, pagination, states, dialogs
+    forms/ layout/      Form fields; shell, navigation, search
+    dashboard/ doctors/ patients/
+  hooks/ lib/           URL state, API client, query hooks, schemas
+  proxy.ts              Redirects signed-out visitors
+server/                 Express API
+  src/modules/          auth, doctors, patients, dashboard, search, activity
+  src/models/           Admin, Session, Doctor, Patient, Activity
+  src/middleware/       Auth, rate limits, origin guard, errors
+  scripts/              seed, create-admin, local-db
+  tests/                API tests against a real mongod
 ```
 
 **A list request.** Typing in a search box updates local state. After 300 ms the term is written to the URL with `history.replaceState`, which changes the TanStack Query key. The hook fetches `/api/doctors?...`, keeping the previous page on screen at reduced opacity. Next rewrites the call to Express, which rate limits it, validates the session, parses the query with Zod and runs one aggregation.
@@ -269,13 +204,9 @@ server/                 Express API
 ### Response shape
 
 ```jsonc
-
-{ "data": { */* resource */* } }                      *// single resource*
-
+{ "data": { */* resource */* } }                      *// single resource*
 { "data": [ */* rows */* ], "meta": { "page": 1, "limit": 10, "total": 18, "totalPages": 2 } }
-
 { "error": { "code": "VALIDATION_ERROR", "message": "…", "details": { "fieldErrors": { "email": "…" } } } }
-
 ```
 
 ## API reference
@@ -284,75 +215,48 @@ Everything except login, logout and health requires the session cookie.
 
 ### Auth
 
-| Method | Path | Notes |
-
-| --- | --- | --- |
-
-| POST | `/api/auth/login` | `{ email, password }`. Sets the cookie. Rate limited |
-
-| POST | `/api/auth/logout` | Deletes the session. `204` |
-
-| GET | `/api/auth/me` | Current admin |
-
-| PATCH | `/api/auth/me` | `{ name, email }` |
-
-| POST | `/api/auth/change-password` | `{ currentPassword, newPassword }`. Signs out other sessions |
+| Method | Path                        | Notes                                                        |
+| ------ | --------------------------- | ------------------------------------------------------------ |
+| POST   | `/api/auth/login`           | `{ email, password }`. Sets the cookie. Rate limited         |
+| POST   | `/api/auth/logout`          | Deletes the session. `204`                                   |
+| GET    | `/api/auth/me`              | Current admin                                                |
+| PATCH  | `/api/auth/me`              | `{ name, email }`                                            |
+| POST   | `/api/auth/change-password` | `{ currentPassword, newPassword }`. Signs out other sessions |
 
 ### Doctors
 
-| Method | Path | Notes |
-
-| --- | --- | --- |
-
-| GET | `/api/doctors` | Query: `page`, `limit` (max 100), `search`, `specialization`, `hospital`, `status`, `addedFrom`, `addedTo`, `sort` (`name`, `specialization`, `hospital`, `patientCount`, `createdAt`), `order` |
-
-| POST | `/api/doctors` | `{ name, specialization, hospital, phone, email, status? }` |
-
-| GET | `/api/doctors/filters` | Distinct specializations and hospitals |
-
-| GET | `/api/doctors/options` | Lightweight list for pickers |
-
-| GET | `/api/doctors/:id` | Includes `patientCount` |
-
-| PATCH | `/api/doctors/:id` | Any subset of fields |
-
-| DELETE | `/api/doctors/:id` | `?reassignTo=<doctorId>` is required if the doctor has patients, otherwise `409 DOCTOR_HAS_PATIENTS` |
-
-| GET | `/api/doctors/:id/patients` | Same query as `GET /api/patients` |
-
-| POST | `/api/doctors/:id/patients` | Creates a patient under this doctor |
+| Method | Path                        | Notes                                                                                                                                                                                           |
+| ------ | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/api/doctors`              | Query: `page`, `limit` (max 100), `search`, `specialization`, `hospital`, `status`, `addedFrom`, `addedTo`, `sort` (`name`, `specialization`, `hospital`, `patientCount`, `createdAt`), `order` |
+| POST   | `/api/doctors`              | `{ name, specialization, hospital, phone, email, status? }`                                                                                                                                     |
+| GET    | `/api/doctors/filters`      | Distinct specializations and hospitals                                                                                                                                                          |
+| GET    | `/api/doctors/options`      | Lightweight list for pickers                                                                                                                                                                    |
+| GET    | `/api/doctors/:id`          | Includes `patientCount`                                                                                                                                                                         |
+| PATCH  | `/api/doctors/:id`          | Any subset of fields                                                                                                                                                                            |
+| DELETE | `/api/doctors/:id`          | `?reassignTo=<doctorId>` is required if the doctor has patients, otherwise `409 DOCTOR_HAS_PATIENTS`                                                                                            |
+| GET    | `/api/doctors/:id/patients` | Same query as `GET /api/patients`                                                                                                                                                               |
+| POST   | `/api/doctors/:id/patients` | Creates a patient under this doctor                                                                                                                                                             |
 
 ### Patients
 
-| Method | Path | Notes |
-
-| --- | --- | --- |
-
-| GET | `/api/patients` | Query: `page`, `limit`, `search`, `doctor`, `condition`, `status`, `registeredFrom`, `registeredTo`, `sort` (`fullName`, `doctor`, `condition`, `status`, `registeredAt`), `order` |
-
-| GET | `/api/patients/filters` | Distinct conditions |
-
-| GET | `/api/patients/:id` | Includes the doctor reference |
-
-| PATCH | `/api/patients/:id` | Any subset of fields. Setting `doctor` reassigns |
-
-| DELETE | `/api/patients/:id` | `204` |
+| Method | Path                    | Notes                                                                                                                                                                              |
+| ------ | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/api/patients`         | Query: `page`, `limit`, `search`, `doctor`, `condition`, `status`, `registeredFrom`, `registeredTo`, `sort` (`fullName`, `doctor`, `condition`, `status`, `registeredAt`), `order` |
+| GET    | `/api/patients/filters` | Distinct conditions                                                                                                                                                                |
+| GET    | `/api/patients/:id`     | Includes the doctor reference                                                                                                                                                      |
+| PATCH  | `/api/patients/:id`     | Any subset of fields. Setting `doctor` reassigns                                                                                                                                   |
+| DELETE | `/api/patients/:id`     | `204`                                                                                                                                                                              |
 
 Patient body: `{ fullName, dateOfBirth, gender, phone, email?, address, condition, status?, registeredAt? }`. Dates are `YYYY-MM-DD`.
 
 ### Other
 
-| Method | Path | Notes |
-
-| --- | --- | --- |
-
-| GET | `/api/dashboard/stats` | Metrics, chart series, recent records, activity |
-
-| GET | `/api/activity` | `?limit=` (max 50) |
-
-| GET | `/api/search` | `?q=` (min 2 characters). Top five doctors and patients |
-
-| GET | `/api/health` | Public. `503` if the database is disconnected |
+| Method | Path                   | Notes                                                   |
+| ------ | ---------------------- | ------------------------------------------------------- |
+| GET    | `/api/dashboard/stats` | Metrics, chart series, recent records, activity         |
+| GET    | `/api/activity`        | `?limit=` (max 50)                                      |
+| GET    | `/api/search`          | `?q=` (min 2 characters). Top five doctors and patients |
+| GET    | `/api/health`          | Public. `503` if the database is disconnected           |
 
 ### Status codes
 
@@ -375,11 +279,8 @@ The doctor table shows a patient count on every row and can sort by it. The comm
 Instead, the patient collection stays the only source of truth and a single aggregation does the work. The position of the `$lookup` is the key detail:
 
 ```text
-
-sort by name:         $match → $sort → $skip → $limit → $lookup count
-
+sort by name:         $match → $sort → $skip → $limit → $lookup count
 sort by patientCount: $match → $lookup count → $sort → $skip → $limit
-
 ```
 
 Normally the count is computed for only the 10 rows on screen, using the `{ doctor }` index. Only sorting by count pays for counting every doctor, and it's a cost that can't be avoided short of denormalizing. With a directory of hundreds of doctors that's well within reason, and if it ever weren't, a cached count could be added then, with the aggregation as the way to rebuild it. The patient list uses the same pattern for its doctor join.
@@ -388,30 +289,22 @@ Text indexes follow the same thinking: indexes on name, specialization, hospital
 
 ## Screenshots
 
-| Doctors | Doctor details |
-
-| --- | --- |
-
+| Doctors                                          | Doctor details                                         |
+| ------------------------------------------------ | ------------------------------------------------------ |
 | ![Doctors](docs/screenshots/desktop-doctors.png) | ![Doctor details](docs/screenshots/desktop-doctor.png) |
 
-| Patients | Sign in |
-
-| --- | --- |
-
+| Patients                                           | Sign in                                        |
+| -------------------------------------------------- | ---------------------------------------------- |
 | ![Patients](docs/screenshots/desktop-patients.png) | ![Sign in](docs/screenshots/desktop-login.png) |
 
-| Mobile dashboard | Mobile doctors | Mobile patients | Tablet |
-
-| --- | --- | --- | --- |
-
+| Mobile dashboard                                           | Mobile doctors                                         | Mobile patients                                          | Tablet                                                   |
+| ---------------------------------------------------------- | ------------------------------------------------------ | -------------------------------------------------------- | -------------------------------------------------------- |
 | ![Mobile dashboard](docs/screenshots/mobile-dashboard.png) | ![Mobile doctors](docs/screenshots/mobile-doctors.png) | ![Mobile patients](docs/screenshots/mobile-patients.png) | ![Tablet patients](docs/screenshots/tablet-patients.png) |
 
 ## Testing
 
 ```bash
-
 cd server && npm test
-
 ```
 
 30 API tests run against a real `mongod` (downloaded on first run, so allow a minute). They cover sign-in and session handling, rate limiting including spoofed `X-Forwarded-For`, NoSQL injection attempts, CRUD, search, filtering, sorting and pagination, every path through doctor deletion, and the dashboard's date and comparison logic.
@@ -445,11 +338,8 @@ The two apps deploy separately. One working combination is MongoDB Atlas, the AP
 **2. API.**
 
 ```bash
-
-npm ci && npm run build   *# build*
-
-npm start                 *# run*
-
+npm ci && npm run build   *# build*
+npm start                 *# run*
 ```
 
 Set `NODE_ENV=production`, `MONGODB_URI`, `CLIENT_ORIGIN=https://your-frontend.example`, and `TRUST_PROXY` to the number of proxies in front of the API. A Next rewrite plus a platform load balancer is usually `2`. Use `/api/health` as the health check.
